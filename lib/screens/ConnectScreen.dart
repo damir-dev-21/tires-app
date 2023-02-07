@@ -51,8 +51,10 @@ class _ConnectScreenState extends State<ConnectScreen> {
         showToastConnection(fToast);
       }
     });
-    return Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: authProvider.isAuth ? MainScreen() : LoginScreen());
+    return const Scaffold(
+      resizeToAvoidBottomInset: false,
+      // body: authProvider.isAuth ? MainScreen() : LoginScreen()
+      body: MainScreen(),
+    );
   }
 }

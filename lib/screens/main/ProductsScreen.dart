@@ -92,7 +92,9 @@ class _ProductScreenState extends State<ProductScreen>
                 onPressed: () async {
                   await productProvider.getSynchronization(context);
                   await cartProvider.checkOrders();
-                  await cartProvider.checkBalance(authProvider.user);
+                  if (authProvider.isAuth) {
+                    await cartProvider.checkBalance(authProvider.user);
+                  }
                   await cartProvider.checkRate();
 
                   if (productProvider.list_of_messages.length > 0) {
@@ -307,6 +309,6 @@ class _ProductScreenState extends State<ProductScreen>
             ),
           )),
         ),
-        drawer: const AppDrawer());
+        drawer: authProvider.isAuth ? const AppDrawer() : null);
   }
 }

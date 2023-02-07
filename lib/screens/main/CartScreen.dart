@@ -301,470 +301,518 @@ class _CartScreenState extends State<CartScreen> {
           ],
         ),
         body: SafeArea(
-            child: Stack(
-          children: [
-            Container(
-              decoration: const BoxDecoration(color: appColor),
-            ),
-            Container(
-              width: double.infinity,
-              height: double.infinity,
-              margin: const EdgeInsets.only(top: 10),
-              decoration: const BoxDecoration(
-                  color: Color.fromARGB(255, 240, 240, 240),
-                  borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(30),
-                      topLeft: Radius.circular(30))),
-              child: cartProvider.cart.isEmpty
-                  ? Center(
-                      child: Text(langs[authProvider.langIndex]['empty_cart']),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.all(20.0),
+            child: !authProvider.isAuth
+                ? Container(
+                    margin: const EdgeInsets.only(bottom: 200),
+                    height: MediaQuery.of(context).size.height,
+                    child: Center(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                langs[authProvider.langIndex]
-                                    ['products_in_cart'],
-                                style: const TextStyle(
-                                    color: textColorDark,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16),
-                              ),
-                              cartProvider.additional_cart.isEmpty
-                                  ? const SizedBox()
-                                  : ElevatedButton.icon(
-                                      onPressed: () {
-                                        Navigator.of(context)
-                                            .push(_createRoute());
-                                      },
-                                      icon: const Icon(Icons.arrow_right),
-                                      label: Text(
-                                        "Доп заказ",
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 12),
-                                      )),
-                            ],
-                          ),
-                          Container(
-                            padding: const EdgeInsets.only(top: 20),
-                            height: MediaQuery.of(context).size.height / 2.2,
-                            child: Column(
-                              children: [
-                                Expanded(
-                                    child: ListView.builder(
-                                        itemCount: cartProvider.cart.length,
-                                        itemBuilder: (ctx, index) {
-                                          final Product product =
-                                              cartProvider.cart[index];
-                                          return Stack(
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () {
-                                                  context.router.push(DetailRoute(
-                                                      product: product,
-                                                      manageCountVisible:
-                                                          _manageCountVisible,
-                                                      isaddition: false));
-                                                },
-                                                child: Container(
-                                                  margin: const EdgeInsets.only(
-                                                      bottom: 10),
-                                                  padding:
-                                                      const EdgeInsets.all(10),
-                                                  height: 110,
-                                                  decoration: BoxDecoration(
-                                                      color: Colors.white,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10)),
-                                                  child: Row(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      SizedBox(
-                                                        child: Image.asset(
-                                                            product.image,
-                                                            width: 50),
-                                                      ),
-                                                      Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          SizedBox(
-                                                            width: 150,
-                                                            child: Text(
-                                                              product.name,
-                                                              maxLines: 1,
-                                                              style:
-                                                                  const TextStyle(
-                                                                      fontSize:
-                                                                          13),
-                                                            ),
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .symmetric(
-                                                                    vertical:
-                                                                        5),
-                                                            child: Text(
-                                                              product.price
-                                                                      .toString() +
-                                                                  langs[authProvider
-                                                                          .langIndex]
-                                                                      [
-                                                                      'currency'],
-                                                              style: const TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  fontSize: 14),
-                                                            ),
-                                                          ),
-                                                          RatingBar.builder(
-                                                            initialRating:
-                                                                product
-                                                                    .priority,
-                                                            minRating: 1,
-                                                            itemSize: 14,
-                                                            direction:
-                                                                Axis.horizontal,
-                                                            allowHalfRating:
-                                                                false,
-                                                            itemCount: 5,
-                                                            itemPadding:
-                                                                const EdgeInsets
-                                                                        .symmetric(
-                                                                    horizontal:
-                                                                        1.0),
-                                                            itemBuilder:
-                                                                (context, _) =>
-                                                                    const Icon(
-                                                              Icons.circle,
-                                                              color: appColor,
-                                                            ),
-                                                            onRatingUpdate:
-                                                                (rating) {
-                                                              cartProvider
-                                                                  .changePriorityProduct(
-                                                                      rating,
-                                                                      product);
-                                                              print(rating);
-                                                            },
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .only(
-                                                                top: 12.0),
-                                                        child: Row(
-                                                          children: [
-                                                            HoldDetector(
-                                                              onHold: () {
-                                                                context
-                                                                    .read<
-                                                                        CartProvider>()
-                                                                    .changeCurrentCount(
-                                                                        "DEC",
-                                                                        product);
-                                                              },
-                                                              child: Container(
-                                                                  padding: const EdgeInsets
-                                                                          .symmetric(
-                                                                      horizontal:
-                                                                          15,
-                                                                      vertical:
-                                                                          10),
-                                                                  decoration: BoxDecoration(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              3),
-                                                                      color:
-                                                                          textColorLight),
-                                                                  child:
-                                                                      const Text(
-                                                                    "-",
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            16,
-                                                                        color: Colors
-                                                                            .white),
-                                                                  )),
-                                                            ),
-                                                            Padding(
-                                                              padding: const EdgeInsets
-                                                                      .symmetric(
-                                                                  horizontal:
-                                                                      8),
-                                                              child: Text(product
-                                                                  .currentCount
-                                                                  .toString()),
-                                                            ),
-                                                            HoldDetector(
-                                                              onHold: () {
-                                                                context
-                                                                    .read<
-                                                                        CartProvider>()
-                                                                    .changeCurrentCount(
-                                                                        "INC",
-                                                                        product);
-                                                              },
-                                                              child: Container(
-                                                                  padding: const EdgeInsets
-                                                                          .symmetric(
-                                                                      horizontal:
-                                                                          15,
-                                                                      vertical:
-                                                                          10),
-                                                                  decoration: BoxDecoration(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              3),
-                                                                      color:
-                                                                          appColor),
-                                                                  child:
-                                                                      const Text(
-                                                                    "+",
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            16,
-                                                                        color: Colors
-                                                                            .white),
-                                                                  )),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                              Positioned(
-                                                  top: 2,
-                                                  right: 5,
-                                                  child: GestureDetector(
-                                                    onTap: () {
-                                                      context
-                                                          .read<CartProvider>()
-                                                          .deleteFromCart(
-                                                              product);
-                                                    },
-                                                    child: Row(
-                                                      children: [
-                                                        Icon(
-                                                          Icons.close,
-                                                          color: Colors.black,
-                                                          size: 20,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  )),
-                                            ],
-                                          );
-                                        })),
-                              ],
+                          Center(
+                            child: Text(
+                              'Необходимо войти в приложение',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16),
                             ),
                           ),
                           SizedBox(
-                            height: 5,
+                            height: 10,
                           ),
-                          Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    langs[authProvider.langIndex]['total'],
-                                    style: const TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16),
-                                  ),
-                                  Text(
-                                    context
-                                        .read<CartProvider>()
-                                        .total
-                                        .toString(),
-                                    style: const TextStyle(fontSize: 16),
-                                  )
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    langs[authProvider.langIndex]
-                                        ['order-count'],
-                                    style: const TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16),
-                                  ),
-                                  Text(
-                                    context
-                                        .read<CartProvider>()
-                                        .total_count
-                                        .toString(),
-                                    style: const TextStyle(fontSize: 16),
-                                  )
-                                ],
-                              ),
-                              authProvider.isAddition
-                                  ? Row(
+                          ElevatedButton(
+                            onPressed: () {
+                              context.router.push(LoginRoute());
+                            },
+                            child: Text("Войти"),
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(appColor)),
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                : Stack(
+                    children: [
+                      Container(
+                        decoration: const BoxDecoration(color: appColor),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        height: double.infinity,
+                        margin: const EdgeInsets.only(top: 10),
+                        decoration: const BoxDecoration(
+                            color: Color.fromARGB(255, 240, 240, 240),
+                            borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(30),
+                                topLeft: Radius.circular(30))),
+                        child: cartProvider.cart.isEmpty
+                            ? Center(
+                                child: Text(langs[authProvider.langIndex]
+                                    ['empty_cart']),
+                              )
+                            : Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           langs[authProvider.langIndex]
-                                              ['order-count_addition'],
+                                              ['products_in_cart'],
                                           style: const TextStyle(
-                                              color: Colors.black,
+                                              color: textColorDark,
                                               fontWeight: FontWeight.bold,
                                               fontSize: 16),
                                         ),
-                                        Text(
-                                          context
-                                              .read<CartProvider>()
-                                              .total_count_additional
-                                              .toString(),
-                                          style: const TextStyle(fontSize: 16),
-                                        )
+                                        cartProvider.additional_cart.isEmpty
+                                            ? const SizedBox()
+                                            : ElevatedButton.icon(
+                                                onPressed: () {
+                                                  Navigator.of(context)
+                                                      .push(_createRoute());
+                                                },
+                                                icon: const Icon(
+                                                    Icons.arrow_right),
+                                                label: Text(
+                                                  "Доп заказ",
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 12),
+                                                )),
                                       ],
-                                    )
-                                  : const SizedBox(),
-                            ],
-                          ),
-                          cartProvider.isLoad
-                              ? const Center(
-                                  child: CircularProgressIndicator(),
-                                )
-                              : SizedBox(
-                                  width: MediaQuery.of(context).size.width,
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(top: 20.0),
-                                        child: SizedBox(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width /
-                                              2.5,
-                                          height: 40,
-                                          child: ElevatedButton(
-                                              style: ButtonStyle(
-                                                  backgroundColor:
-                                                      MaterialStateProperty
-                                                          .resolveWith(
-                                                              (states) =>
-                                                                  appColor)),
-                                              onPressed: () async {
-                                                await authProvider
-                                                    .checkConnection();
-                                                if (authProvider.hasConnect ==
-                                                    false) {
-                                                  showToastConnection(fToast);
-                                                  // cartProvider.setOrderToDb();
-                                                } else {
-                                                  // await context
-                                                  //     .read<CartProvider>()
-                                                  //     .showAllClient(context);
-                                                  bool status =
-                                                      await cartProvider
-                                                          .checkOrder(
-                                                              context,
-                                                              productProvider
-                                                                  .products,
-                                                              authProvider);
-                                                  bool haslimit = context
-                                                      .read<CartProvider>()
-                                                      .haslimit;
-                                                  setState(() {
-                                                    if (haslimit == true ||
-                                                        status == false) {
-                                                      minHeightOfSheet = 800;
-                                                      status_slide =
-                                                          !status_slide;
-                                                    } else {
-                                                      minHeightOfSheet = 0;
-                                                    }
-                                                  });
-                                                }
-                                              },
-                                              child: Text(
-                                                langs[authProvider.langIndex]
-                                                    ['set_order'],
-                                                style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 16),
-                                              )),
-                                        ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.only(top: 20),
+                                      height:
+                                          MediaQuery.of(context).size.height /
+                                              2.2,
+                                      child: Column(
+                                        children: [
+                                          Expanded(
+                                              child: ListView.builder(
+                                                  itemCount:
+                                                      cartProvider.cart.length,
+                                                  itemBuilder: (ctx, index) {
+                                                    final Product product =
+                                                        cartProvider
+                                                            .cart[index];
+                                                    return Stack(
+                                                      children: [
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            context.router.push(
+                                                                DetailRoute(
+                                                                    product:
+                                                                        product,
+                                                                    manageCountVisible:
+                                                                        _manageCountVisible,
+                                                                    isaddition:
+                                                                        false));
+                                                          },
+                                                          child: Container(
+                                                            margin:
+                                                                const EdgeInsets
+                                                                        .only(
+                                                                    bottom: 10),
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(10),
+                                                            height: 110,
+                                                            decoration: BoxDecoration(
+                                                                color: Colors
+                                                                    .white,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            10)),
+                                                            child: Row(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                SizedBox(
+                                                                  child: Image.asset(
+                                                                      product
+                                                                          .image,
+                                                                      width:
+                                                                          50),
+                                                                ),
+                                                                Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    SizedBox(
+                                                                      width:
+                                                                          150,
+                                                                      child:
+                                                                          Text(
+                                                                        product
+                                                                            .name,
+                                                                        maxLines:
+                                                                            1,
+                                                                        style: const TextStyle(
+                                                                            fontSize:
+                                                                                13),
+                                                                      ),
+                                                                    ),
+                                                                    Padding(
+                                                                      padding: const EdgeInsets
+                                                                              .symmetric(
+                                                                          vertical:
+                                                                              5),
+                                                                      child:
+                                                                          Text(
+                                                                        product.price.toString() +
+                                                                            langs[authProvider.langIndex]['currency'],
+                                                                        style: const TextStyle(
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                            fontSize: 14),
+                                                                      ),
+                                                                    ),
+                                                                    RatingBar
+                                                                        .builder(
+                                                                      initialRating:
+                                                                          product
+                                                                              .priority,
+                                                                      minRating:
+                                                                          1,
+                                                                      itemSize:
+                                                                          14,
+                                                                      direction:
+                                                                          Axis.horizontal,
+                                                                      allowHalfRating:
+                                                                          false,
+                                                                      itemCount:
+                                                                          5,
+                                                                      itemPadding: const EdgeInsets
+                                                                              .symmetric(
+                                                                          horizontal:
+                                                                              1.0),
+                                                                      itemBuilder:
+                                                                          (context, _) =>
+                                                                              const Icon(
+                                                                        Icons
+                                                                            .circle,
+                                                                        color:
+                                                                            appColor,
+                                                                      ),
+                                                                      onRatingUpdate:
+                                                                          (rating) {
+                                                                        cartProvider.changePriorityProduct(
+                                                                            rating,
+                                                                            product);
+                                                                        print(
+                                                                            rating);
+                                                                      },
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                Padding(
+                                                                  padding: const EdgeInsets
+                                                                          .only(
+                                                                      top:
+                                                                          12.0),
+                                                                  child: Row(
+                                                                    children: [
+                                                                      HoldDetector(
+                                                                        onHold:
+                                                                            () {
+                                                                          context.read<CartProvider>().changeCurrentCount(
+                                                                              "DEC",
+                                                                              product);
+                                                                        },
+                                                                        child: Container(
+                                                                            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                                                                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: textColorLight),
+                                                                            child: const Text(
+                                                                              "-",
+                                                                              style: TextStyle(fontSize: 16, color: Colors.white),
+                                                                            )),
+                                                                      ),
+                                                                      Padding(
+                                                                        padding:
+                                                                            const EdgeInsets.symmetric(horizontal: 8),
+                                                                        child: Text(product
+                                                                            .currentCount
+                                                                            .toString()),
+                                                                      ),
+                                                                      HoldDetector(
+                                                                        onHold:
+                                                                            () {
+                                                                          context.read<CartProvider>().changeCurrentCount(
+                                                                              "INC",
+                                                                              product);
+                                                                        },
+                                                                        child: Container(
+                                                                            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                                                                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: appColor),
+                                                                            child: const Text(
+                                                                              "+",
+                                                                              style: TextStyle(fontSize: 16, color: Colors.white),
+                                                                            )),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Positioned(
+                                                            top: 2,
+                                                            right: 5,
+                                                            child:
+                                                                GestureDetector(
+                                                              onTap: () {
+                                                                context
+                                                                    .read<
+                                                                        CartProvider>()
+                                                                    .deleteFromCart(
+                                                                        product);
+                                                              },
+                                                              child: Row(
+                                                                children: [
+                                                                  Icon(
+                                                                    Icons.close,
+                                                                    color: Colors
+                                                                        .black,
+                                                                    size: 20,
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            )),
+                                                      ],
+                                                    );
+                                                  })),
+                                        ],
                                       ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(top: 20.0),
-                                        child: SizedBox(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width /
-                                              2.5,
-                                          height: 40,
-                                          child: ElevatedButton(
-                                              style: ButtonStyle(
-                                                  backgroundColor: MaterialStateProperty
-                                                      .resolveWith((states) =>
-                                                          authProvider.isAddition
-                                                              ? Theme.of(
-                                                                      context)
-                                                                  .primaryColor
-                                                              : Colors.grey)),
-                                              onPressed: () {
-                                                authProvider.isAddition
-                                                    ? context.router.push(
-                                                        const AdditionOrderRoute())
-                                                    : authProvider.showAlert(
-                                                        context,
-                                                        "Доступ запрещен",
-                                                        AlertType.error);
-                                              },
-                                              child: const Text(
-                                                "Доп заказ",
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 16),
-                                              )),
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              langs[authProvider.langIndex]
+                                                  ['total'],
+                                              style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16),
+                                            ),
+                                            Text(
+                                              context
+                                                  .read<CartProvider>()
+                                                  .total
+                                                  .toString(),
+                                              style:
+                                                  const TextStyle(fontSize: 16),
+                                            )
+                                          ],
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                        ],
-                      ),
-                    ),
-            )
-          ],
-        )),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              langs[authProvider.langIndex]
+                                                  ['order-count'],
+                                              style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16),
+                                            ),
+                                            Text(
+                                              context
+                                                  .read<CartProvider>()
+                                                  .total_count
+                                                  .toString(),
+                                              style:
+                                                  const TextStyle(fontSize: 16),
+                                            )
+                                          ],
+                                        ),
+                                        authProvider.isAddition
+                                            ? Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    langs[authProvider
+                                                            .langIndex][
+                                                        'order-count_addition'],
+                                                    style: const TextStyle(
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 16),
+                                                  ),
+                                                  Text(
+                                                    context
+                                                        .read<CartProvider>()
+                                                        .total_count_additional
+                                                        .toString(),
+                                                    style: const TextStyle(
+                                                        fontSize: 16),
+                                                  )
+                                                ],
+                                              )
+                                            : const SizedBox(),
+                                      ],
+                                    ),
+                                    cartProvider.isLoad
+                                        ? const Center(
+                                            child: CircularProgressIndicator(),
+                                          )
+                                        : SizedBox(
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 20.0),
+                                                  child: SizedBox(
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width /
+                                                            2.5,
+                                                    height: 40,
+                                                    child: ElevatedButton(
+                                                        style: ButtonStyle(
+                                                            backgroundColor:
+                                                                MaterialStateProperty
+                                                                    .resolveWith(
+                                                                        (states) =>
+                                                                            appColor)),
+                                                        onPressed: () async {
+                                                          await authProvider
+                                                              .checkConnection();
+                                                          if (authProvider
+                                                                  .hasConnect ==
+                                                              false) {
+                                                            showToastConnection(
+                                                                fToast);
+                                                            // cartProvider.setOrderToDb();
+                                                          } else {
+                                                            // await context
+                                                            //     .read<CartProvider>()
+                                                            //     .showAllClient(context);
+                                                            bool status = await cartProvider
+                                                                .checkOrder(
+                                                                    context,
+                                                                    productProvider
+                                                                        .products,
+                                                                    authProvider);
+                                                            bool haslimit = context
+                                                                .read<
+                                                                    CartProvider>()
+                                                                .haslimit;
+                                                            setState(() {
+                                                              if (haslimit ==
+                                                                      true ||
+                                                                  status ==
+                                                                      false) {
+                                                                minHeightOfSheet =
+                                                                    800;
+                                                                status_slide =
+                                                                    !status_slide;
+                                                              } else {
+                                                                minHeightOfSheet =
+                                                                    0;
+                                                              }
+                                                            });
+                                                          }
+                                                        },
+                                                        child: Text(
+                                                          langs[authProvider
+                                                                  .langIndex]
+                                                              ['set_order'],
+                                                          style:
+                                                              const TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontSize: 16),
+                                                        )),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 20.0),
+                                                  child: SizedBox(
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width /
+                                                            2.5,
+                                                    height: 40,
+                                                    child: ElevatedButton(
+                                                        style: ButtonStyle(
+                                                            backgroundColor: MaterialStateProperty.resolveWith((states) =>
+                                                                authProvider
+                                                                        .isAddition
+                                                                    ? Theme.of(
+                                                                            context)
+                                                                        .primaryColor
+                                                                    : Colors
+                                                                        .grey)),
+                                                        onPressed: () {
+                                                          authProvider
+                                                                  .isAddition
+                                                              ? context.router.push(
+                                                                  const AdditionOrderRoute())
+                                                              : authProvider
+                                                                  .showAlert(
+                                                                      context,
+                                                                      "Доступ запрещен",
+                                                                      AlertType
+                                                                          .error);
+                                                        },
+                                                        child: const Text(
+                                                          "Доп заказ",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 16),
+                                                        )),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                  ],
+                                ),
+                              ),
+                      )
+                    ],
+                  )),
       ),
     );
   }

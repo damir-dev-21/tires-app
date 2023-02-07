@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "446932448926",
+    "project_id": "agromash-message",
+    "storage_bucket": "agromash-message.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:446932448926:android:61ccf2e137a9b4060b6d8f",
+        "android_client_info": {
+          "package_name": "com.devdamir.tires"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "446932448926-aot84rsfcgsutiuv9otb8qj26uca6u92.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBihNBfjVHI_pSsfkPTgSQ2Kes8CvAaUR0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "446932448926-aot84rsfcgsutiuv9otb8qj26uca6u92.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "446932448926-83thg5rpu92q6vupod2puesjr9ude6bp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.tires.tiresApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

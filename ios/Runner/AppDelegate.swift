@@ -22,3 +22,5 @@ import flutter_local_notifications
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }
+
+// SJ479V5344

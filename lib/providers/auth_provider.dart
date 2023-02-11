@@ -6,6 +6,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -16,12 +17,13 @@ import 'package:tires_app/providers/cart_provider.dart';
 import 'package:tires_app/routes/router.dart';
 import 'package:tires_app/services/database_helper.dart';
 import 'package:tires_app/services/notification_service.dart';
+import 'package:tires_app/widgets/notifications.dart';
 
 class AuthProvider extends ChangeNotifier {
   DatabaseHelper _databaseHelper = DatabaseHelper();
   Box<User> getLangs() => Hive.box<User>('users');
-  late User user;
-  late bool isAddition;
+  User user = User().defaultUser();
+  bool isAddition = true;
 
   bool isAuth = false;
   bool isLoad = false;
@@ -302,6 +304,10 @@ class AuthProvider extends ChangeNotifier {
                                 subdivision = subdivision_f;
                                 notifyListeners();
                                 Navigator.pop(context);
+                                final fToast = FToast();
+                                fToast.init(context);
+                                showToastMessage_subdivision(fToast, context,
+                                    'Установлено подразделение ${subdivision_f['subdivision_name']}');
                               },
                               child: Container(
                                 margin: const EdgeInsets.only(bottom: 10),

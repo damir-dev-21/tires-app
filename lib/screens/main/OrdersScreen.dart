@@ -65,75 +65,72 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   icon: const Icon(Icons.sync))
         ],
       ),
-      body: !authProvider.isAuth
-          ? SizedBox(
-              height: MediaQuery.of(context).size.height,
-              child: Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Center(
-                      child: Text(
-                        'Необходимо войти в приложение',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        context.router.push(LoginRoute());
-                      },
-                      child: Text("Войти"),
-                      style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(appColor)),
-                    )
-                  ],
-                ),
-              ),
-            )
-          : Container(
-              child: context.read<CartProvider>().orders.isEmpty
-                  ? Center(
-                      child: Text(langs[authProvider.langIndex]['orders-none']),
-                    )
-                  : Column(
-                      children: [
-                        Expanded(
-                            child: ListView.builder(
-                                itemCount:
-                                    context.read<CartProvider>().orders.length,
-                                itemBuilder: (ctx, index) {
-                                  final order = context
-                                      .read<CartProvider>()
-                                      .orders[index];
-                                  var statusOrder = order.status ==
-                                          StatusOrder.newOrder.name
-                                      ? "Новый"
-                                      : order.status ==
-                                              StatusOrder.onTheWay.name
-                                          ? "В пути"
-                                          : order.status ==
-                                                  StatusOrder.shipment.name
-                                              ? "Отгрузка"
-                                              : order.status ==
-                                                      StatusOrder.confirmed.name
-                                                  ? 'Подтвержден'
-                                                  : order.status ==
-                                                          StatusOrder
-                                                              .unconfirmed.name
-                                                      ? "Не подтвержден"
-                                                      : "Отказано";
+      body:
+          // !authProvider.isAuth
+          //     ? SizedBox(
+          //         height: MediaQuery.of(context).size.height,
+          //         child: Center(
+          //           child: Column(
+          //             crossAxisAlignment: CrossAxisAlignment.center,
+          //             mainAxisAlignment: MainAxisAlignment.center,
+          //             children: [
+          //               Center(
+          //                 child: Text(
+          //                   'Необходимо войти в приложение',
+          //                   style: TextStyle(
+          //                       fontWeight: FontWeight.bold, fontSize: 16),
+          //                 ),
+          //               ),
+          //               SizedBox(
+          //                 height: 10,
+          //               ),
+          //               ElevatedButton(
+          //                 onPressed: () {
+          //                   context.router.push(LoginRoute());
+          //                 },
+          //                 child: Text("Войти"),
+          //                 style: ButtonStyle(
+          //                     backgroundColor: MaterialStateProperty.all(appColor)),
+          //               )
+          //             ],
+          //           ),
+          //         ),
+          //       )
+          //     :
+          Container(
+        child: context.read<CartProvider>().orders.isEmpty
+            ? Center(
+                child: Text(langs[authProvider.langIndex]['orders-none']),
+              )
+            : Column(
+                children: [
+                  Expanded(
+                      child: ListView.builder(
+                          itemCount: context.read<CartProvider>().orders.length,
+                          itemBuilder: (ctx, index) {
+                            final order =
+                                context.read<CartProvider>().orders[index];
+                            var statusOrder = order.status ==
+                                    StatusOrder.newOrder.name
+                                ? "Новый"
+                                : order.status == StatusOrder.onTheWay.name
+                                    ? "В пути"
+                                    : order.status == StatusOrder.shipment.name
+                                        ? "Отгрузка"
+                                        : order.status ==
+                                                StatusOrder.confirmed.name
+                                            ? 'Подтвержден'
+                                            : order.status ==
+                                                    StatusOrder.unconfirmed.name
+                                                ? "Не подтвержден"
+                                                : "Отказано";
 
-                                  return OrderItem(
-                                      order: order, statusOrder: statusOrder);
-                                }))
-                      ],
-                    ),
-            ),
+                            return OrderItem(
+                                order: order, statusOrder: statusOrder);
+                          }))
+                ],
+              ),
+      ),
     );
   }
 }

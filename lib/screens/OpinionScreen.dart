@@ -46,6 +46,9 @@ class _OpinionScreenState extends State<OpinionScreen> {
                 theme = '';
                 content = '';
               });
+            } else {
+              showAlert(
+                  context, "Произошла ошибка при отправке", AlertType.error);
             }
           } else {
             showAlert(

@@ -32,6 +32,7 @@ class _CartScreenState extends State<CartScreen> {
   double minHeightOfSheet = 0;
   bool status_slide = false;
   late FToast fToast;
+  bool isAuth = true;
 
   @override
   void initState() {
@@ -301,7 +302,7 @@ class _CartScreenState extends State<CartScreen> {
           ],
         ),
         body: SafeArea(
-            child: !authProvider.isAuth
+            child: !isAuth
                 ? Container(
                     margin: const EdgeInsets.only(bottom: 200),
                     height: MediaQuery.of(context).size.height,
@@ -712,6 +713,13 @@ class _CartScreenState extends State<CartScreen> {
                                                                         (states) =>
                                                                             appColor)),
                                                         onPressed: () async {
+                                                          if (!authProvider
+                                                              .isAuth) {
+                                                            setState(() {
+                                                              isAuth = false;
+                                                            });
+                                                            return;
+                                                          }
                                                           await authProvider
                                                               .checkConnection();
                                                           if (authProvider
@@ -784,8 +792,8 @@ class _CartScreenState extends State<CartScreen> {
                                                                     : Colors
                                                                         .grey)),
                                                         onPressed: () {
-                                                          authProvider
-                                                                  .isAddition
+                                                          authProvider.isAddition ||
+                                                                  !isAuth
                                                               ? context.router.push(
                                                                   const AdditionOrderRoute())
                                                               : authProvider

@@ -2,6 +2,8 @@
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:tires_app/constants/colors.dart';
@@ -9,6 +11,7 @@ import 'package:tires_app/providers/auth_provider.dart';
 import 'package:tires_app/providers/cart_provider.dart';
 import 'package:tires_app/routes/router.dart';
 import 'package:tires_app/services/languages.dart';
+import 'package:tires_app/widgets/ProfileListItem.dart';
 import 'package:tires_app/widgets/notifications.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -24,10 +27,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController _controller2 = TextEditingController();
   bool isLoad_balance = false;
   bool isLoad_exchange = false;
+  bool isAuth = true;
+  late FToast fToast;
 
   @override
   void initState() {
     super.initState();
+    fToast = FToast();
+    fToast.init(context);
   }
 
   @override
@@ -36,8 +43,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final CartProvider cartProvider = Provider.of<CartProvider>(context);
 
     if (authProvider.isAuth) {
-      _controller.text = authProvider.user.password ?? "";
-      _controller2.text = authProvider.user.name ?? "";
+      _controller.text = authProvider.user.password;
+      _controller2.text = authProvider.user.name;
     }
 
     return Scaffold(
@@ -48,52 +55,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
             height: 40,
           ),
         ),
-        body: !authProvider.isAuth
-            ? SizedBox(
-                height: MediaQuery.of(context).size.height,
-                child: Center(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: Text(
-                          'Необходимо войти в приложение',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          context.router.push(LoginRoute());
-                        },
-                        child: Text("Войти"),
-                        style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all(appColor)),
-                      )
-                    ],
-                  ),
-                ),
-              )
-            : SingleChildScrollView(
-                child: Container(
-                  padding: const EdgeInsets.all(15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+        body: SingleChildScrollView(
+          child: Container(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                authProvider.isAuth
+                    ? Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           CircleAvatar(
                             radius: 40,
                             child: Text(
-                              authProvider.user.name[
-                                  authProvider.user.name.length -
-                                      (authProvider.user.name.length)],
+                              authProvider.user.name[0],
                               style: const TextStyle(fontSize: 25),
                             ),
                           ),
@@ -164,235 +139,216 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ],
                           )
                         ],
+                      )
+                    : SizedBox(),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        context.router.push(const OrdersRoute());
+                      },
+                      child: Text(
+                        langs[authProvider.langIndex]['myOrders'],
+                        style: const TextStyle(fontSize: 18),
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(
-                            height: 50,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              context.router.push(const OrdersRoute());
-                            },
-                            child: Text(
-                              langs[authProvider.langIndex]['myOrders'],
-                              style: const TextStyle(fontSize: 18),
-                            ),
-                          ),
-                          const Divider(),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              authProvider.user.act_sverki
-                                  ? context.router
-                                      .push(const CollationActRoute())
-                                  : authProvider.showAlert(context,
-                                      "Доступ запрещен", AlertType.error);
-                            },
-                            child: Text(
-                              langs[authProvider.langIndex]['akt_sverki'],
-                              style: const TextStyle(fontSize: 18),
-                            ),
-                          ),
-                          const Divider(),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              authProvider.user.act_sverki_detail
-                                  ? context.router
-                                      .push(const CollationActDetailRoute())
-                                  : authProvider.showAlert(context,
-                                      "Доступ запрещен", AlertType.error);
-                            },
-                            child: Text(
-                              langs[authProvider.langIndex]
-                                  ['akt_sverki_detail'],
-                              style: const TextStyle(fontSize: 18),
-                            ),
-                          ),
-                          const Divider(),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              authProvider.user.bonus
-                                  ? context.router
-                                      .push(const AccountBonusRoute())
-                                  : authProvider.showAlert(context,
-                                      "Доступ запрещен", AlertType.error);
-                            },
-                            child: Text(
-                              langs[authProvider.langIndex]['account_bonus'],
-                              style: const TextStyle(fontSize: 18),
-                            ),
-                          ),
-                          const Divider(),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              authProvider.user.deficit
-                                  ? context.router.push(const DeficitRoute())
-                                  : authProvider.showAlert(context,
-                                      "Доступ запрещен", AlertType.error);
-                            },
-                            child: Text(
-                              langs[authProvider.langIndex]['deficit_list'],
-                              style: const TextStyle(fontSize: 18),
-                            ),
-                          ),
-                          const Divider(),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              authProvider.user.subdivision_access
-                                  ? authProvider.showAllSubdivision(context)
-                                  : authProvider.showAlert(context,
-                                      "Доступ запрещен", AlertType.error);
-                            },
-                            child: Text(
-                              langs[authProvider.langIndex]['subdivision'],
-                              style: const TextStyle(fontSize: 18),
-                            ),
-                          ),
-                          const Divider(),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          GestureDetector(
-                            onTap: () async {
-                              try {
-                                setState(() {
-                                  isLoad_exchange = true;
-                                });
-                                await cartProvider.checkRate();
-                                authProvider.showAlert(
-                                    context,
-                                    "Курс валюты: " +
-                                        cartProvider.course_rate.toString(),
-                                    AlertType.success);
-                              } catch (e) {
-                                print(e);
-                                throw e;
-                              } finally {
-                                setState(() {
-                                  isLoad_exchange = false;
-                                });
-                              }
-                            },
-                            child: isLoad_exchange
-                                ? CircularProgressIndicator()
-                                : Text(
-                                    langs[authProvider.langIndex]['exchange'],
-                                    style: const TextStyle(fontSize: 18),
-                                  ),
-                          ),
-                          const Divider(),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              context.router.push(OpinionRoute());
-                            },
-                            child: Text(
-                              langs[authProvider.langIndex]['review'],
-                              style: const TextStyle(fontSize: 18),
-                            ),
-                          ),
-                          const Divider(),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          GestureDetector(
-                            onTap: () async {
-                              try {
-                                setState(() {
-                                  isLoad_balance = true;
-                                });
-                                await cartProvider
-                                    .checkBalance(authProvider.user);
-                              } catch (e) {
-                                print(e);
-                                throw e;
-                              } finally {
-                                setState(() {
-                                  isLoad_balance = false;
-                                });
-                              }
-                              authProvider.user.balance
-                                  ? authProvider.showAlert(
-                                      context,
-                                      cartProvider.balance.toString(),
-                                      AlertType.success)
-                                  : authProvider.showAlert(context,
-                                      "Доступ запрещен", AlertType.error);
-                            },
-                            child: isLoad_balance
-                                ? CircularProgressIndicator()
-                                : Text(
-                                    langs[authProvider.langIndex]['balance'],
-                                    style: const TextStyle(fontSize: 18),
-                                  ),
-                          ),
-                          const Divider(),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              context.router.push(ChangeLanguageRoute());
-                            },
-                            child: Text(
-                              langs[authProvider.langIndex]['changeLangText'],
-                              style: const TextStyle(fontSize: 18),
-                            ),
-                          ),
-                          const Divider(),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              context.router.push(SettingsRoute());
-                            },
-                            child: Text(
-                              langs[authProvider.langIndex]["settings"],
-                              style: const TextStyle(fontSize: 18),
-                            ),
-                          ),
-                          const Divider(),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          GestureDetector(
-                            onTap: () async {
-                              await context
-                                  .read<AuthProvider>()
-                                  .logout(context);
-                            },
-                            child: Text(
-                              langs[authProvider.langIndex]["logout"],
-                              style: const TextStyle(fontSize: 18),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 50,
+                    ),
+                    const Divider(),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    authProvider.isAuth
+                        ? ProfileListItem(
+                            authProvider.isAuth,
+                            const CollationActRoute(),
+                            langs[authProvider.langIndex]['akt_sverki'],
+                            authProvider.user,
                           )
-                        ],
+                        : SizedBox(),
+                    authProvider.isAuth
+                        ? ProfileListItem(
+                            authProvider.isAuth,
+                            const CollationActDetailRoute(),
+                            langs[authProvider.langIndex]['akt_sverki_detail'],
+                            authProvider.user,
+                          )
+                        : SizedBox(),
+                    authProvider.isAuth
+                        ? ProfileListItem(
+                            authProvider.isAuth,
+                            const AccountBonusRoute(),
+                            langs[authProvider.langIndex]['account_bonus'],
+                            authProvider.user,
+                          )
+                        : SizedBox(),
+                    authProvider.isAuth
+                        ? ProfileListItem(
+                            authProvider.isAuth,
+                            const DeficitRoute(),
+                            langs[authProvider.langIndex]['deficit_list'],
+                            authProvider.user,
+                          )
+                        : SizedBox(),
+                    authProvider.isAuth
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    if (!authProvider.isAuth) {
+                                      showToastMessage_auth(fToast, context,
+                                          'Необходимо войти в приложение');
+                                      return;
+                                    }
+                                    authProvider.user.subdivision_access
+                                        ? authProvider
+                                            .showAllSubdivision(context)
+                                        : authProvider.showAlert(context,
+                                            "Доступ запрещен", AlertType.error);
+                                  },
+                                  child: Text(
+                                    langs[authProvider.langIndex]
+                                        ['subdivision'],
+                                    style: const TextStyle(fontSize: 18),
+                                  ),
+                                ),
+                                const Divider(),
+                                const SizedBox(
+                                  height: 20,
+                                )
+                              ])
+                        : SizedBox(),
+                    authProvider.isAuth
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                                GestureDetector(
+                                  onTap: () async {
+                                    if (!authProvider.isAuth) {
+                                      showToastMessage_auth(fToast, context,
+                                          'Необходимо войти в приложение');
+                                      return;
+                                    }
+                                    try {
+                                      setState(() {
+                                        isLoad_exchange = true;
+                                      });
+                                      await cartProvider.checkRate();
+                                      authProvider.showAlert(
+                                          context,
+                                          "Курс валюты: " +
+                                              cartProvider.course_rate
+                                                  .toString(),
+                                          AlertType.success);
+                                    } catch (e) {
+                                      print(e);
+                                      throw e;
+                                    } finally {
+                                      setState(() {
+                                        isLoad_exchange = false;
+                                      });
+                                    }
+                                  },
+                                  child: isLoad_exchange
+                                      ? CircularProgressIndicator()
+                                      : Text(
+                                          langs[authProvider.langIndex]
+                                              ['exchange'],
+                                          style: const TextStyle(fontSize: 18),
+                                        ),
+                                ),
+                                const Divider(),
+                                const SizedBox(
+                                  height: 20,
+                                )
+                              ])
+                        : SizedBox(),
+                    ProfileListItem(
+                        isAuth,
+                        OpinionRoute(),
+                        langs[authProvider.langIndex]['review'],
+                        authProvider.user),
+                    authProvider.isAuth
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                                GestureDetector(
+                                  onTap: () async {
+                                    if (!authProvider.isAuth) {
+                                      showToastMessage_auth(fToast, context,
+                                          'Необходимо войти в приложение');
+                                      return;
+                                    }
+                                    try {
+                                      setState(() {
+                                        isLoad_balance = true;
+                                      });
+                                      await cartProvider
+                                          .checkBalance(authProvider.user);
+                                    } catch (e) {
+                                      print(e);
+                                      throw e;
+                                    } finally {
+                                      setState(() {
+                                        isLoad_balance = false;
+                                      });
+                                    }
+                                    authProvider.user.balance
+                                        ? authProvider.showAlert(
+                                            context,
+                                            cartProvider.balance.toString(),
+                                            AlertType.success)
+                                        : authProvider.showAlert(context,
+                                            "Доступ запрещен", AlertType.error);
+                                  },
+                                  child: isLoad_balance
+                                      ? CircularProgressIndicator()
+                                      : Text(
+                                          langs[authProvider.langIndex]
+                                              ['balance'],
+                                          style: const TextStyle(fontSize: 18),
+                                        ),
+                                ),
+                                const Divider(),
+                                const SizedBox(
+                                  height: 20,
+                                )
+                              ])
+                        : SizedBox(),
+                    authProvider.isAuth
+                        ? ProfileListItem(
+                            isAuth,
+                            const ChangeLanguageRoute(),
+                            langs[authProvider.langIndex]['changeLangText'],
+                            authProvider.user)
+                        : SizedBox(),
+                    authProvider.isAuth
+                        ? ProfileListItem(
+                            isAuth,
+                            SettingsRoute(),
+                            langs[authProvider.langIndex]['settings'],
+                            authProvider.user)
+                        : SizedBox(),
+                    GestureDetector(
+                      onTap: () async {
+                        await context.read<AuthProvider>().logout(context);
+                      },
+                      child: Text(
+                        langs[authProvider.langIndex]["logout"],
+                        style: const TextStyle(fontSize: 18),
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(
+                      height: 50,
+                    )
+                  ],
                 ),
-              ));
+              ],
+            ),
+          ),
+        ));
   }
 }

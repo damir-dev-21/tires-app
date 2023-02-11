@@ -42,4 +42,27 @@ class User extends HiveObject {
   late List<dynamic> subdivisions;
   @HiveField(18)
   late bool trust_payment;
+
+  User defaultUser() {
+    return User()
+      ..id = 0
+      ..name = ' '
+      ..password = ''
+      ..token = ''
+      ..language = 0
+      ..customers = []
+      ..imei = ''
+      ..messaging_token = ''
+      ..act_sverki = false
+      ..act_sverki_detail = false
+      ..addition = false
+      ..balance = false
+      ..deficit = false
+      ..load = false
+      ..group_customers = false
+      ..bonus = false
+      ..subdivision_access = false
+      ..subdivisions = []
+      ..trust_payment = false;
+  }
 }

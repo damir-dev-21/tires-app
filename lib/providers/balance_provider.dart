@@ -126,8 +126,7 @@ class BalanceProvider extends ChangeNotifier {
       final responce_base64 = await http.get(
           Uri.parse(urlBalanceDetail_base64 + url_params),
           headers: {'Authorization': basicAuth_siyobAgromash});
-      isLoad = true;
-      notifyListeners();
+
       if (responce.statusCode == 200 && responce_base64.statusCode == 200) {
         String body = utf8.decode(responce.bodyBytes);
         final extracted_data = json.decode(body) as Map<String, dynamic>;
@@ -186,7 +185,7 @@ class BalanceProvider extends ChangeNotifier {
           headers: {'Authorization': basicAuth_sklad!},
           body: jsonEncode(params_base64));
       isLoad = true;
-
+      accountBonus.clear();
       notifyListeners();
 
       if (responce.statusCode == 200 && responce_base64.statusCode == 200) {

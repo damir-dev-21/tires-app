@@ -1,12 +1,20 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:tires_app/models/Product/Product.dart';
+import 'package:tires_app/providers/cart_provider.dart';
+import 'package:tires_app/providers/products_provider.dart';
+import 'package:tires_app/routes/router.dart';
 import 'package:tires_app/services/database_helper.dart';
 import 'package:tires_app/services/notification_handler.dart';
 
@@ -17,7 +25,7 @@ class FirebaseNotifications {
   void setupFirebase(BuildContext context) {
     _messaging = FirebaseMessaging.instance;
     // NotificationHandler.initNotification(context);
-    NotificationService().initNotification();
+    NotificationService().initNotification(context);
     firebaseCloudMessageListener(context);
     myContext = context;
   }
@@ -68,8 +76,14 @@ class FirebaseNotifications {
         //         ));
       }
     });
-    FirebaseMessaging.onMessageOpenedApp.listen((remoteMessage) {
-      print('Receive open app: ${remoteMessage}');
+    FirebaseMessaging.onMessageOpenedApp.listen((remoteMessage) async {
+      var payload = remoteMessage.data;
+      await context.read<ProductProvider>().getSynchronization(null);
+      await context.read<CartProvider>().checkOrders();
+      Map<String, dynamic> responce =
+          json.decode(payload['message'].toString());
+
+      NotificationService().openNotification(responce, context);
     });
   }
 
@@ -106,17 +120,17 @@ class FirebaseNotifications {
     // );
 
     DatabaseHelper _db = DatabaseHelper();
-    print(title);
-    print(body);
+
     var responce = json.decode(body) as Map<String, dynamic>;
 
     await _db.insertMessage({"id": Random().nextInt(1000), "text": body});
-
+    print(responce);
     if (responce['status'] == 'New') {
       NotificationService().showNotification(
         id: Random().nextInt(1000),
         title: responce['message'],
         body: '${DateFormat("dd-MM-yyyy - kk:mm").format(DateTime.now())}',
+        payLoad: json.encode(responce),
       );
       // await NotificationHandler.flutterLocalNotificationPlugin.show(
       //   888,
@@ -138,6 +152,7 @@ class FirebaseNotifications {
         id: Random().nextInt(1000),
         title: responce['message'],
         body: '${DateFormat("dd-MM-yyyy - kk:mm").format(DateTime.now())}',
+        payLoad: json.encode(responce),
       );
       // await NotificationHandler.flutterLocalNotificationPlugin.show(
       //   888,
@@ -156,6 +171,7 @@ class FirebaseNotifications {
         id: Random().nextInt(1000),
         title: responce['message'],
         body: '${DateFormat("dd-MM-yyyy - kk:mm").format(DateTime.now())}',
+        payLoad: json.encode(responce),
       );
       // await NotificationHandler.flutterLocalNotificationPlugin.show(
       //   888,
@@ -174,6 +190,7 @@ class FirebaseNotifications {
         id: Random().nextInt(1000),
         title: responce['message'],
         body: '${DateFormat("dd-MM-yyyy - kk:mm").format(DateTime.now())}',
+        payLoad: json.encode(responce),
       );
       // await NotificationHandler.flutterLocalNotificationPlugin.show(
       //   888,
@@ -187,11 +204,19 @@ class FirebaseNotifications {
       //         importance: Importance.max),
       //   ),
       // );
+    } else if (responce['status'] == 'balance') {
+      NotificationService().showNotification(
+        id: Random().nextInt(1000),
+        title: responce['message'],
+        body: '${DateFormat("dd-MM-yyyy - kk:mm").format(DateTime.now())}',
+        payLoad: json.encode(responce),
+      );
     } else {
       NotificationService().showNotification(
         id: Random().nextInt(1000),
         title: responce['message'],
         body: '${DateFormat("dd-MM-yyyy - kk:mm").format(DateTime.now())}',
+        payLoad: json.encode(responce),
       );
       await _db.changeOrderStatus(
           responce['uuid'], responce['status'], responce['uuid_sale']);

@@ -11,7 +11,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:tires_app/models/Order.dart';
 import 'package:tires_app/models/Orders/Orders.dart';
-import 'package:tires_app/models/Product.dart';
+import 'package:tires_app/models/Product/Product.dart';
 import 'package:tires_app/models/Products/Products.dart';
 import 'package:tires_app/models/User/User.dart';
 import 'package:tires_app/providers/auth_provider.dart';
@@ -22,8 +22,11 @@ import 'package:tires_app/screens/SplashScreen.dart';
 import 'package:tires_app/services/firebase_notification_handler.dart';
 import 'package:tires_app/services/notification_service.dart';
 
+import 'models/Cart/Cart.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_backroundHandler);
 
@@ -33,10 +36,13 @@ void main() async {
   Hive.registerAdapter(UserAdapter());
   Hive.registerAdapter(ProductsAdapter());
   Hive.registerAdapter(OrdersAdapter());
+  Hive.registerAdapter(CartAdapter());
+  Hive.registerAdapter(ProductAdapter());
 
   await Hive.openBox<User>('users');
   await Hive.openBox<Product>('products');
   await Hive.openBox<Orders>('orders');
+  await Hive.openBox<Cart>('cart');
 
   final ProductProvider productProvider = ProductProvider();
   final AuthProvider authProvider = AuthProvider();

@@ -5,7 +5,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:tires_app/models/Message.dart';
 import 'package:tires_app/models/Order.dart';
-import 'package:tires_app/models/Product.dart';
+import 'package:tires_app/models/Product/Product.dart';
 
 class DatabaseHelper {
   Future<Database> database() async {

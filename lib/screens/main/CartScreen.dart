@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:tires_app/constants/colors.dart';
-import 'package:tires_app/models/Product.dart';
+import 'package:tires_app/models/Product/Product.dart';
 import 'package:tires_app/providers/auth_provider.dart';
 import 'package:tires_app/providers/cart_provider.dart';
 import 'package:tires_app/providers/products_provider.dart';
@@ -477,8 +477,10 @@ class _CartScreenState extends State<CartScreen> {
                                                                               5),
                                                                       child:
                                                                           Text(
-                                                                        product.price.toString() +
-                                                                            langs[authProvider.langIndex]['currency'],
+                                                                        authProvider.isAuth == false || authProvider.user.name == 'test'
+                                                                            ? '100' +
+                                                                                langs[authProvider.langIndex]['currency']
+                                                                            : product.price.toString() + langs[authProvider.langIndex]['currency'],
                                                                         style: const TextStyle(
                                                                             fontWeight:
                                                                                 FontWeight.bold,
@@ -621,10 +623,20 @@ class _CartScreenState extends State<CartScreen> {
                                                   fontSize: 16),
                                             ),
                                             Text(
-                                              context
-                                                  .read<CartProvider>()
-                                                  .total
-                                                  .toString(),
+                                              authProvider.isAuth == false ||
+                                                      authProvider.user.name ==
+                                                          'test'
+                                                  ? (cartProvider.cart.fold(
+                                                      0,
+                                                      (previousValue,
+                                                              element) =>
+                                                          previousValue +
+                                                          (element.currentCount *
+                                                              100))).toString()
+                                                  : context
+                                                      .read<CartProvider>()
+                                                      .total
+                                                      .toString(),
                                               style:
                                                   const TextStyle(fontSize: 16),
                                             )

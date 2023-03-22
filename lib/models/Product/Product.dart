@@ -1,15 +1,32 @@
+import 'package:hive/hive.dart';
+
+part 'Product.g.dart';
+
+@HiveType(typeId: 5)
 class Product {
+  @HiveField(0)
   final int id;
+  @HiveField(1)
   final String guid;
+  @HiveField(2)
   final String name;
+  @HiveField(3)
   final String image;
+  @HiveField(4)
   final String category;
+  @HiveField(5)
   final String groups;
+  @HiveField(6)
   final String producer;
+  @HiveField(7)
   final String typesize;
+  @HiveField(8)
   final double price;
+  @HiveField(9)
   final int count;
+  @HiveField(10)
   double priority;
+  @HiveField(11)
   int currentCount = 0;
 
   Product(

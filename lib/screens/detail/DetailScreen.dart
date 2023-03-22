@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:holding_gesture/holding_gesture.dart';
 import 'package:provider/provider.dart';
-import 'package:tires_app/models/Product.dart';
+import 'package:tires_app/models/Product/Product.dart';
 import 'package:tires_app/providers/auth_provider.dart';
 import 'package:tires_app/providers/cart_provider.dart';
 import 'package:tires_app/services/languages.dart';
@@ -271,8 +271,11 @@ class _DetailScreenState extends State<DetailScreen> {
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   Text(
-                    widget.product.price.toString() +
-                        langs[authProvider.langIndex]['currency'],
+                    authProvider.isAuth == false ||
+                            authProvider.user.name == 'test'
+                        ? '100' + langs[authProvider.langIndex]['currency']
+                        : widget.product.price.toString() +
+                            langs[authProvider.langIndex]['currency'],
                     style: const TextStyle(fontSize: 16),
                   ),
                 ],
@@ -329,7 +332,9 @@ class _DetailScreenState extends State<DetailScreen> {
                     langs[authProvider.langIndex]['have'],
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
-                  widget.product.count > 100
+                  widget.product.count > 100 ||
+                          authProvider.isAuth == false ||
+                          authProvider.user.name == 'test'
                       ? Row(
                           children: [
                             Icon(

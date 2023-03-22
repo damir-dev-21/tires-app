@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:tires_app/models/Product.dart';
+import 'package:tires_app/models/Product/Product.dart';
 import 'package:tires_app/screens/AdditionOrderListScreen.dart';
 import 'package:tires_app/screens/AdditionOrderScreen.dart';
 import 'package:tires_app/screens/OpinionScreen.dart';

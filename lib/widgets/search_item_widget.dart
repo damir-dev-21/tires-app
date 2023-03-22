@@ -2,7 +2,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:holding_gesture/holding_gesture.dart';
 import 'package:provider/provider.dart';
-import 'package:tires_app/models/Product.dart';
+import 'package:tires_app/models/Product/Product.dart';
+import 'package:tires_app/providers/auth_provider.dart';
 import 'package:tires_app/providers/products_provider.dart';
 import 'package:tires_app/routes/router.dart';
 
@@ -42,6 +43,7 @@ class _SearchItemWidgetState extends State<SearchItemWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final AuthProvider authProvider = context.read<AuthProvider>();
     final Product product = context.read<ProductProvider>().products.firstWhere(
           (element) => element.guid == widget.product.guid,
         );
@@ -76,14 +78,16 @@ class _SearchItemWidgetState extends State<SearchItemWidget> {
                 widget.product.category,
                 style: const TextStyle(fontSize: 12),
               ),
-              Text(
-                widget.product.count < 100 && widget.product.count != 0
-                    ? "Остаток: " + widget.product.count.toString()
-                    : widget.product.count <= 0
-                        ? "Остаток:  Нету"
-                        : "Остаток: Много",
-                style: const TextStyle(fontSize: 12),
-              )
+              authProvider.isAuth == false || authProvider.user.name == 'test'
+                  ? Text("Остаток: Много")
+                  : Text(
+                      widget.product.count < 100 && widget.product.count != 0
+                          ? "Остаток: " + widget.product.count.toString()
+                          : widget.product.count <= 0
+                              ? "Остаток:  Нету"
+                              : "Остаток: Много",
+                      style: const TextStyle(fontSize: 12),
+                    )
             ]),
           ),
           trailing: SizedBox(

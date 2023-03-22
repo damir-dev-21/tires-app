@@ -46,13 +46,30 @@
 //   }
 // }
 
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/instance_manager.dart';
+import 'package:get/route_manager.dart';
+import 'package:provider/provider.dart';
+import 'package:tires_app/models/Message.dart';
+import 'package:tires_app/providers/cart_provider.dart';
+import 'package:tires_app/providers/products_provider.dart';
+import 'package:tires_app/routes/router.dart';
+import 'package:auto_route/auto_route.dart';
+import 'package:tires_app/screens/NotificationScreen.dart';
+
+import '../main.dart';
+import '../models/Product/Product.dart';
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin notificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  Future<void> initNotification() async {
+  Future<void> initNotification(BuildContext context) async {
     AndroidInitializationSettings initializationSettingsAndroid =
         const AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -67,7 +84,17 @@ class NotificationService {
         android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
     await notificationsPlugin.initialize(initializationSettings,
         onDidReceiveNotificationResponse:
-            (NotificationResponse notificationResponse) async {});
+            (NotificationResponse notificationResponse) {
+      handleMessage(context, notificationResponse.payload);
+    });
+  }
+
+  void handleMessage(BuildContext context, payload) async {
+    await context.read<ProductProvider>().getSynchronization(null);
+
+    context.read<CartProvider>().checkOrders();
+    var responce = json.decode(payload);
+    openNotification(responce, context);
   }
 
   notificationDetails() {
@@ -80,7 +107,86 @@ class NotificationService {
 
   Future showNotification(
       {int id = 0, String? title, String? body, String? payLoad}) async {
-    return notificationsPlugin.show(
-        id, title, body, await notificationDetails());
+    return notificationsPlugin
+        .show(id, title, body, await notificationDetails(), payload: payLoad);
+  }
+
+  void openNotification(Map<String, dynamic> responce, BuildContext context) {
+    if (responce['status'] == 'New') {
+      List<Product> allProducts = context.read<ProductProvider>().products;
+      List<Map<String, dynamic>> notificationProducts = [];
+      responce['goods'].forEach((e) {
+        Product product = allProducts.firstWhere(
+            (element) => element.guid == e['guid'],
+            orElse: () => Product(0, '', '', '', '', '', '', '', 0, 0, 0, 0));
+        if (product.id != 0) {
+          notificationProducts.add(product.toMap());
+        }
+      });
+      context.router
+          .push(NotificationDetailRoute(products: notificationProducts));
+    } else if (responce['status'] == 'New_Division') {
+      List<Product> allProducts = context.read<ProductProvider>().products;
+      List<Map<String, dynamic>> notificationProducts = [];
+      responce['goods'].forEach((e) {
+        Product product = allProducts.firstWhere(
+            (element) => element.guid == e['guid'],
+            orElse: () => Product(0, '', '', '', '', '', '', '', 0, 0, 0, 0));
+        if (product.id != 0) {
+          notificationProducts.add(product.toMap());
+        }
+      });
+      context.router
+          .push(NotificationDetailRoute(products: notificationProducts));
+    } else if (responce['status'] == 'price_list') {
+      List<dynamic> allNotifications =
+          context.read<ProductProvider>().list_of_messages;
+
+      List<dynamic> price_notifications = [];
+      allNotifications.forEach((e) {
+        if (e.status == 'Прайс лист') {
+          price_notifications.add(e);
+        }
+      });
+
+      context.router.push(
+          NotificationCategoryDetailRoute(notifications: price_notifications));
+    } else if (responce['status'] == 'money') {
+      List<dynamic> allNotifications =
+          context.read<ProductProvider>().list_of_messages;
+      List<dynamic> money_notifications = [];
+      allNotifications.forEach((e) {
+        if (e.status == 'Поступление_Касса') {
+          money_notifications.add(e);
+        }
+      });
+
+      context.router.push(
+          NotificationCategoryDetailRoute(notifications: money_notifications));
+    } else if (responce['status'] == 'balance') {
+      List<dynamic> allNotifications =
+          context.read<ProductProvider>().list_of_messages;
+      List<dynamic> money_notifications = [];
+      allNotifications.forEach((e) {
+        if (e.status == 'Акт сверки') {
+          money_notifications.add(e);
+        }
+      });
+
+      context.router.push(
+          NotificationCategoryDetailRoute(notifications: money_notifications));
+    } else {
+      List<dynamic> allNotifications =
+          context.read<ProductProvider>().list_of_messages;
+      List<dynamic> order_notifications = [];
+      allNotifications.forEach((e) {
+        if (e.status == 'Заказ') {
+          order_notifications.add(e);
+        }
+      });
+
+      context.router.push(
+          NotificationCategoryDetailRoute(notifications: order_notifications));
+    }
   }
 }

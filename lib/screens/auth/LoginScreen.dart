@@ -56,6 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 child: TextFormField(
                   keyboardType: TextInputType.emailAddress,
+                  key: const ValueKey('email'),
                   onChanged: (e) {
                     setState(() {
                       name = e;
@@ -81,6 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 child: TextField(
                   keyboardType: TextInputType.text,
+                  key: const ValueKey('password'),
                   onChanged: (text) => {
                     setState(() {
                       password = text;
@@ -130,6 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: CircularProgressIndicator(),
                       )
                     : Container(
+                        key: const ValueKey('signIn'),
                         width: double.infinity,
                         height: 50,
                         decoration: BoxDecoration(

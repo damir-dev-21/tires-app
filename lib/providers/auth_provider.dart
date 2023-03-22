@@ -361,22 +361,34 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> logout(BuildContext context) async {
-    isAuth = false;
-    isLoad = false;
-    message = '';
-    DatabaseHelper _db = DatabaseHelper();
+    try {
+      var imei = await getDeviceSerialNumber(user.name);
+      Map<String, dynamic> object = {"name": user.name, "imei": imei};
+      print(object);
+      final responce = await http.post(
+          Uri.parse('http://web.corp.siyob.uz:9696/sklad/hs/mobile/logout/'),
+          headers: {'Authorization': basicAuth_sklad!},
+          body: jsonEncode(object));
+      print(responce.statusCode);
+      isAuth = false;
+      isLoad = false;
+      message = '';
+      DatabaseHelper _db = DatabaseHelper();
 
-    getLangs().delete("1");
-    _db.deleteImei();
-    context.router.push(const LoginRoute());
-    notifyListeners();
+      getLangs().delete("1");
+      _db.deleteImei();
+      context.router.push(const LoginRoute());
+    } catch (e) {
+      print(e);
+      throw e;
+    }
   }
 
   Future<void> deleteAccount(BuildContext context) async {
     try {
-      Map<String, dynamic> object = {
-        "name": user.name,
-      };
+      var imei = await getDeviceSerialNumber(user.name);
+      Map<String, dynamic> object = {"name": user.name, "imei": imei};
+      print(object);
       final responce = await http.post(
           Uri.parse('http://web.corp.siyob.uz:9696/sklad/hs/mobile/logout/'),
           headers: {'Authorization': basicAuth_sklad!},

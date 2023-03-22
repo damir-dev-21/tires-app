@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:tires_app/models/Product.dart';
+import 'package:tires_app/models/Product/Product.dart';
 
 class Order {
   final int userId;

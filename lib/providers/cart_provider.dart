@@ -12,7 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:tires_app/models/Order.dart';
 import 'package:tires_app/models/Orders/Orders.dart';
-import 'package:tires_app/models/Product.dart';
+import 'package:tires_app/models/Product/Product.dart';
 import 'package:http/http.dart' as http;
 import 'package:tires_app/models/User/User.dart';
 import 'package:tires_app/providers/auth_provider.dart';
@@ -24,12 +24,14 @@ import 'package:tires_app/widgets/notifications.dart';
 
 import '../constants/colors.dart';
 import '../constants/config.dart';
+import '../models/Cart/Cart.dart';
 
 ProductProvider productProvider = ProductProvider();
 
 class CartProvider extends ChangeNotifier {
   DatabaseHelper _db = DatabaseHelper();
   Box<Orders> getOrdersFromDb() => Hive.box<Orders>('orders');
+  Box<Cart> getCartFromDb() => Hive.box<Cart>('cart');
   List<Product> cart = [];
   final List<Product> additional_cart = [];
   List<Order> orders = [];
@@ -52,6 +54,8 @@ class CartProvider extends ChangeNotifier {
 
   Future<void> checkOrders() async {
     var order_box = await _db.getOrders();
+    var cart_box = getCartFromDb().get('cart');
+    var addition_cart_box = getCartFromDb().get('addition_cart');
 
     if (order_box != null) {
       orders.clear();
@@ -59,6 +63,22 @@ class CartProvider extends ChangeNotifier {
         orders.add(element);
       });
     }
+
+    if (cart_box != null) {
+      cart.clear();
+      cart_box.cart.forEach((element) {
+        cart.add(element);
+      });
+      changeTotalPrice();
+    }
+    if (addition_cart_box != null) {
+      additional_cart.clear();
+      addition_cart_box.cart.forEach((element) {
+        additional_cart.add(element);
+      });
+      changeTotalPriceAdditionalCart();
+    }
+
     notifyListeners();
   }
 
@@ -68,6 +88,7 @@ class CartProvider extends ChangeNotifier {
     if (findProduct.id == 0) {
       cart.add(item);
     }
+    getCartFromDb().put('cart', Cart(cart));
     changeTotalPrice();
     notifyListeners();
   }
@@ -79,6 +100,7 @@ class CartProvider extends ChangeNotifier {
     if (findProduct.id == 0) {
       additional_cart.add(item);
     }
+    getCartFromDb().put('addition_cart', Cart(additional_cart));
     changeTotalPriceAdditionalCart();
     notifyListeners();
   }
@@ -136,7 +158,7 @@ class CartProvider extends ChangeNotifier {
 
     try {
       if (client.isEmpty) {
-        await showAllClient(context);
+        await showAllClient(context, user);
       }
 
       String messageFromBack = '';
@@ -398,7 +420,7 @@ class CartProvider extends ChangeNotifier {
 
         _showAlert(context, "Заказ оформлен", AlertType.success);
         await checkBalance(user);
-        print(extractedData);
+        getCartFromDb().clear();
       } else {}
       setOrderToDb(uniq_id, uuid_sale);
       clearAllCart();
@@ -408,64 +430,70 @@ class CartProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> showAllClient(BuildContext contexts) async {
+  Future<void> showAllClient(BuildContext contexts, User user) async {
     late BuildContext dialogContext;
-    await showDialog(
-        barrierDismissible: false,
-        context: contexts,
-        builder: (BuildContext context) {
-          dialogContext = context;
-          return Dialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20.0)),
-            child: Container(
-              padding: const EdgeInsets.only(
-                  left: 30, right: 30, top: 30, bottom: 0),
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height / 3.5,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Container(
-                      child: Text(
-                    "Выберите контрагента:",
-                    style: TextStyle(fontSize: 17),
-                  )),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Expanded(
-                      child: ListView.builder(
-                          itemCount: context
-                              .read<AuthProvider>()
-                              .user
-                              .customers
-                              .length,
-                          itemBuilder: (ctx, i) {
-                            var client_f =
-                                context.read<AuthProvider>().user.customers[i];
-                            return InkWell(
-                              onTap: () {
-                                client = client_f;
-                                notifyListeners();
-                                Navigator.pop(context);
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  client_f['customer_name'] ?? '',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16),
+    if (contexts.read<AuthProvider>().user.customers.length == 1) {
+      client = contexts.read<AuthProvider>().user.customers[0];
+    } else {
+      await showDialog(
+          barrierDismissible: false,
+          context: contexts,
+          builder: (BuildContext context) {
+            dialogContext = context;
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0)),
+              child: Container(
+                padding: const EdgeInsets.only(
+                    left: 30, right: 30, top: 30, bottom: 0),
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height / 3.5,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Container(
+                        child: Text(
+                      "Выберите контрагента:",
+                      style: TextStyle(fontSize: 17),
+                    )),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    Expanded(
+                        child: ListView.builder(
+                            itemCount: context
+                                .read<AuthProvider>()
+                                .user
+                                .customers
+                                .length,
+                            itemBuilder: (ctx, i) {
+                              var client_f = context
+                                  .read<AuthProvider>()
+                                  .user
+                                  .customers[i];
+                              return InkWell(
+                                onTap: () {
+                                  client = client_f;
+                                  notifyListeners();
+                                  Navigator.pop(context);
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    client_f['customer_name'] ?? '',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16),
+                                  ),
                                 ),
-                              ),
-                            );
-                          })),
-                ],
+                              );
+                            })),
+                  ],
+                ),
               ),
-            ),
-          );
-        });
+            );
+          });
+    }
   }
 
   void _showCheckBalanceAndTrustPaymentDialog(
@@ -941,6 +969,7 @@ class CartProvider extends ChangeNotifier {
     if (count != 0) {
       product.currentCount = count;
     }
+    changeCartOnDb();
     notifyListeners();
   }
 
@@ -952,6 +981,7 @@ class CartProvider extends ChangeNotifier {
           deleteFromCart(product);
           deleteFromAdditionCart(product);
         }
+
         notifyListeners();
       } else if (product.currentCount < 1) {
         deleteFromCart(product);
@@ -959,8 +989,18 @@ class CartProvider extends ChangeNotifier {
       }
     } else {
       product.currentCount = product.currentCount + 1;
+
       notifyListeners();
     }
+    changeCartOnDb();
+    changeAdditionCartOnDb();
+    // Cart? db_cart = getCartFromDb().get('cart');
+    // db_cart!.cart = cart;
+    // db_cart.save();
+    // Cart? db_addition_cart = getCartFromDb().get('addition_cart');
+    // db_addition_cart!.cart = cart;
+    // db_addition_cart.save();
+
     changeTotalPrice();
   }
 
@@ -985,6 +1025,7 @@ class CartProvider extends ChangeNotifier {
     if (findProduct.id == 0) {
       addToCart(product);
     }
+    changeCartOnDb();
     notifyListeners();
   }
 
@@ -995,12 +1036,24 @@ class CartProvider extends ChangeNotifier {
     if (findProduct.id == 0) {
       addToAdditionalCart(product);
     }
+    changeAdditionCartOnDb();
     notifyListeners();
+  }
+
+  void changeCartOnDb() {
+    getCartFromDb().delete('cart');
+    getCartFromDb().put('cart', Cart(cart));
+  }
+
+  void changeAdditionCartOnDb() {
+    getCartFromDb().delete('addition_cart');
+    getCartFromDb().put('addition_cart', Cart(additional_cart));
   }
 
   void deleteFromCart(Product product) {
     cart.removeWhere((element) => element.id == product.id);
     product.currentCount = 0;
+
     changeTotalPrice();
     notifyListeners();
   }
@@ -1008,6 +1061,7 @@ class CartProvider extends ChangeNotifier {
   void deleteFromAdditionCart(Product product) {
     additional_cart.removeWhere((element) => element.id == product.id);
     product.currentCount = 0;
+
     changeTotalPrice();
     notifyListeners();
   }
@@ -1031,6 +1085,8 @@ class CartProvider extends ChangeNotifier {
     imperfective_answer.clear();
     remainders_answer.clear();
     total = 0;
+
+    getCartFromDb().clear();
 
     productProvider.clearAllCountItems();
     notifyListeners();

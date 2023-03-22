@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:tires_app/models/Product.dart';
+import 'package:tires_app/models/Product/Product.dart';
 
 part 'Products.g.dart';
 

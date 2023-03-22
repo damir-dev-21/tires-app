@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:tires_app/constants/colors.dart';
-import 'package:tires_app/models/Product.dart';
+import 'package:tires_app/models/Product/Product.dart';
 import 'package:tires_app/providers/auth_provider.dart';
 import 'package:tires_app/providers/cart_provider.dart';
 import 'package:tires_app/routes/router.dart';
@@ -98,6 +98,9 @@ class _ProductScreenState extends State<ProductScreen>
                   onPressed: () async {
                     await productProvider.getSynchronization(context);
                     await cartProvider.checkOrders();
+                    // ignore: use_build_context_synchronously
+                    await authProvider.login(authProvider.user.name,
+                        authProvider.user.password, context);
                     if (authProvider.isAuth) {
                       await cartProvider.checkBalance(authProvider.user);
                     }
@@ -269,7 +272,11 @@ class _ProductScreenState extends State<ProductScreen>
                                                               ProductProvider>()
                                                           .recomendation[index];
                                                       return CardItem(
-                                                          product: product);
+                                                          product: product,
+                                                          isAuth: authProvider
+                                                              .isAuth,
+                                                          user: authProvider
+                                                              .user);
                                                     })),
                                           ],
                                         ))
@@ -316,7 +323,11 @@ class _ProductScreenState extends State<ProductScreen>
                                                                 ProductProvider>()
                                                             .newProducts[index];
                                                     return CardItem(
-                                                        product: product);
+                                                      product: product,
+                                                      isAuth:
+                                                          authProvider.isAuth,
+                                                      user: authProvider.user,
+                                                    );
                                                   }))
                                     ],
                                   ))

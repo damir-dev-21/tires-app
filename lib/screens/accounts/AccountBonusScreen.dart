@@ -66,6 +66,39 @@ class _AccountBonusScreenState extends State<AccountBonusScreen> {
     }
   }
 
+  void _sendQuarter(int quarter, client_uuid) async {
+    if (quarter == 1) {
+      await context.read<BalanceProvider>().getAccountBonus(
+          DateFormat("dd.MM.yyyy").format(DateTime(
+            DateTime.now().year,
+          )),
+          DateFormat("dd.MM.yyyy")
+              .format(DateTime.utc(DateTime.now().year, 3, 31, 23, 59, 59)),
+          client_uuid);
+    } else if (quarter == 2) {
+      await context.read<BalanceProvider>().getAccountBonus(
+          DateFormat("dd.MM.yyyy")
+              .format(DateTime.utc(DateTime.now().year, 4, 1, 0, 0, 0)),
+          DateFormat("dd.MM.yyyy")
+              .format(DateTime.utc(DateTime.now().year, 6, 30, 23, 59, 59)),
+          client_uuid);
+    } else if (quarter == 3) {
+      await context.read<BalanceProvider>().getAccountBonus(
+          DateFormat("dd.MM.yyyy")
+              .format(DateTime.utc(DateTime.now().year, 7, 1, 0, 0, 0)),
+          DateFormat("dd.MM.yyyy")
+              .format(DateTime.utc(DateTime.now().year, 9, 30, 23, 59, 59)),
+          client_uuid);
+    } else if (quarter == 4) {
+      await context.read<BalanceProvider>().getAccountBonus(
+          DateFormat("dd.MM.yyyy")
+              .format(DateTime.utc(DateTime.now().year, 10, 1, 0, 0, 0)),
+          DateFormat("dd.MM.yyyy")
+              .format(DateTime.utc(DateTime.now().year, 12, 31, 23, 59, 59)),
+          client_uuid);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -97,6 +130,72 @@ class _AccountBonusScreenState extends State<AccountBonusScreen> {
       }
     }
 
+    void showDialogQuarterly() async {
+      await showDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (ctx) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0)),
+              child: Container(
+                height: 220,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all(appColor)),
+                        onPressed: () async {
+                          await cartProvider.showAllClient(
+                              context, authProvider.user);
+
+                          _sendQuarter(1, cartProvider.client['uuid_customer']);
+                          Navigator.of(context, rootNavigator: true).pop();
+                        },
+                        child: Text('Квартал #1')),
+                    ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all(appColor)),
+                        onPressed: () async {
+                          await cartProvider.showAllClient(
+                              context, authProvider.user);
+                          _sendQuarter(2, cartProvider.client['uuid_customer']);
+                          Navigator.of(context, rootNavigator: true).pop();
+                        },
+                        child: Text('Квартал #2')),
+                    ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all(appColor)),
+                        onPressed: () async {
+                          await cartProvider.showAllClient(
+                              context, authProvider.user);
+                          _sendQuarter(3, cartProvider.client['uuid_customer']);
+                          Navigator.of(context, rootNavigator: true).pop();
+                        },
+                        child: Text('Квартал #3')),
+                    ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all(appColor)),
+                        onPressed: () async {
+                          await cartProvider.showAllClient(
+                              context, authProvider.user);
+                          _sendQuarter(4, cartProvider.client['uuid_customer']);
+                          Navigator.of(context, rootNavigator: true).pop();
+                        },
+                        child: Text('Квартал #4')),
+                  ],
+                ),
+              ),
+            );
+          });
+    }
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -122,71 +221,13 @@ class _AccountBonusScreenState extends State<AccountBonusScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Flexible(
-                    child: SizedBox(
-                      width: 100,
-                      child: TextField(
-                        controller: _controllerDateBegin,
-                        // focusNode: _calFocusNode,
-                        onTap: () async {
-                          FocusScope.of(context).requestFocus(FocusNode());
-                          await cartProvider.showAllClient(context);
-                          _selectDateBegin(
-                            context,
-                            cartProvider.client['uuid_customer'],
-                          );
-                        },
-                        onSubmitted: (value) {
-                          FocusScope.of(context).requestFocus(FocusNode());
-                        },
-                        decoration: InputDecoration(
-                            labelStyle:
-                                TextStyle(fontSize: 16, color: Colors.black),
-                            labelText: DateFormat("dd.MM.yy")
-                                .format(_selectedDateBegin),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(5))),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SizedBox(
-                      width: 15,
-                      height: 2,
-                      child: Container(
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                  Flexible(
-                    child: SizedBox(
-                      width: 100,
-                      child: TextField(
-                        controller: _controllerDateEnd,
-                        // focusNode: _calFocusNode,
-                        onTap: () async {
-                          FocusScope.of(context).requestFocus(FocusNode());
-                          await cartProvider.showAllClient(context);
-                          _selectDateEnd(
-                            context,
-                            cartProvider.client['uuid_customer'],
-                          );
-                        },
-
-                        onSubmitted: (value) {
-                          FocusScope.of(context).requestFocus(FocusNode());
-                        },
-                        decoration: InputDecoration(
-                            labelStyle: const TextStyle(
-                                fontSize: 16, color: Colors.black),
-                            labelText:
-                                DateFormat("dd.MM.yy").format(_selectedDateEnd),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(5))),
-                      ),
-                    ),
-                  ),
+                  ElevatedButton(
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(appColor)),
+                      onPressed: () {
+                        showDialogQuarterly();
+                      },
+                      child: Text('Выбрать квартал')),
                 ],
               ),
             ),
@@ -250,7 +291,7 @@ class _AccountBonusScreenState extends State<AccountBonusScreen> {
                       ],
                       source: BalanceDataSource(
                           balance:
-                              context.read<BalanceProvider>().balanceDetail),
+                              context.read<BalanceProvider>().accountBonus),
                       columns: [
                         GridColumn(
                             columnName: 'client',
@@ -349,18 +390,20 @@ class BalanceDataSource extends DataGridSource {
                   columnName: 'client', value: e['Контрагент']),
               // DataGridCell<String>(
               //     columnName: 'registrator', value: e.registrator),
-              DataGridCell<int>(columnName: 'limit', value: e['Лимит']),
-              DataGridCell<int>(columnName: 'planPay', value: e['ОплатаПлан']),
-              DataGridCell<int>(columnName: 'factPay', value: e['ОплатаФакт']),
-              DataGridCell<int>(
+              DataGridCell<dynamic>(columnName: 'limit', value: e['Лимит']),
+              DataGridCell<dynamic>(
+                  columnName: 'planPay', value: e['ОплатаПлан']),
+              DataGridCell<dynamic>(
+                  columnName: 'factPay', value: e['ОплатаФакт']),
+              DataGridCell<dynamic>(
                   columnName: 'payWithBack', value: e['ОплатаСВозврат']),
-              DataGridCell<int>(
+              DataGridCell<dynamic>(
                   columnName: 'payRemind', value: e['ОплатаОстаток']),
-              DataGridCell<int>(
+              DataGridCell<dynamic>(
                   columnName: 'remindDispatch', value: e['ОстатокОтгрузка']),
-              DataGridCell<int>(columnName: 'done', value: e['Вып']),
-              DataGridCell<int>(columnName: 'dispatch', value: e['Отгр']),
-              DataGridCell<int>(columnName: 'days', value: e['Дни']),
+              DataGridCell<dynamic>(columnName: 'done', value: e['Вып']),
+              DataGridCell<dynamic>(columnName: 'dispatch', value: e['Отгр']),
+              DataGridCell<dynamic>(columnName: 'days', value: e['Дни']),
             ]))
         .toList();
   }

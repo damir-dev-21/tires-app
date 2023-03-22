@@ -1,22 +1,18 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
 import 'package:tires_app/constants/config.dart';
 import 'package:tires_app/constants/images.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:tires_app/models/Message.dart';
-import 'package:tires_app/models/Product.dart';
+import 'package:tires_app/models/Product/Product.dart';
 import 'package:tires_app/models/Products/Products.dart';
-import 'package:tires_app/providers/cart_provider.dart';
 import 'package:tires_app/services/database_helper.dart';
 
 class ProductProvider extends ChangeNotifier {
@@ -38,8 +34,9 @@ class ProductProvider extends ChangeNotifier {
 
   Future<void> getSynchronization(context) async {
     try {
-      await getProducts();
       await getNotifications();
+
+      await getProducts();
     } catch (e) {
       print(e);
     }
@@ -50,6 +47,8 @@ class ProductProvider extends ChangeNotifier {
       list_of_messages.clear();
       var lis_future = await _db.getImei();
       String imei = lis_future[0];
+      DateFormat dateFormat = DateFormat("dd.MM.yyyy");
+
       final responce = await http.post(
         Uri.parse(urlNotifications),
         headers: {'Authorization': basicAuth_sklad!},
@@ -96,7 +95,11 @@ class ProductProvider extends ChangeNotifier {
             content = e['content'];
             status = 'Поступление_Касса';
             message_text = e['message'];
-          } else {
+          } else if (e['status'] == 'Акт сверки') {
+            content = e['content'];
+            status = 'Акт сверки';
+            message_text = e['message'];
+          } else if (e['status'] == 'Заказ') {
             status = 'Заказ';
             Map<String, dynamic> order_from_db =
                 await _db.selectOrder(e['uuid_order']);
@@ -108,23 +111,37 @@ class ProductProvider extends ChangeNotifier {
             message_text = "Статус заказа изменен на " +
                 _defineStatusOrder(e['status_order']);
           }
-
+          String dateOfMessage =
+              DateFormat("yyyy-MM-dd").format(dateFormat.parse(e['date']));
           Message message = Message(
               id: Random().nextInt(1000),
               text: message_text,
               content: content,
-              status: status);
+              status: status,
+              date: dateOfMessage);
           await _db.insertMessage(
               {'id': Random().nextInt(1000), 'text': json.encode(e)});
           list_of_messages.add(message);
-          list_of_messages
-              .sort((a, b) => a.text.length.compareTo(b.text.length));
+
           notifyListeners();
         });
       } else {}
+      list_of_messages.sort((a, b) {
+        return DateTime.parse(a.date).compareTo(DateTime.parse(b.date));
+      });
     } catch (e) {
       print(e);
     }
+  }
+
+  void sortMessages() {
+    list_of_messages.sort((a, b) {
+      return DateTime.parse(b.date).compareTo(DateTime.parse(a.date));
+    });
+    list_of_messages.forEach((e) {
+      print(e.date);
+    });
+    notifyListeners();
   }
 
   Future<void> getStatus(status) async {

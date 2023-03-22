@@ -37,9 +37,13 @@ class ProfileListItem extends StatelessWidget {
                 ? context.router.push(route)
                 : showAlert(context, "Доступ запрещен", AlertType.error);
           },
-          child: Text(
-            text,
-            style: const TextStyle(fontSize: 18),
+          child: Row(
+            children: [
+              Text(
+                text,
+                style: const TextStyle(fontSize: 18),
+              ),
+            ],
           ),
         ),
         const Divider(),

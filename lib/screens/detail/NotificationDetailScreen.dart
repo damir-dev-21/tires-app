@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tires_app/models/Product.dart';
+import 'package:tires_app/models/Product/Product.dart';
 import 'package:tires_app/widgets/search_item_widget.dart';
 
 class NotificationDetailScreen extends StatefulWidget {

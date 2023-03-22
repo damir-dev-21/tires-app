@@ -104,11 +104,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ],
         ),
         body: ListView.builder(
-            itemCount: 4,
+            itemCount: 5,
             itemBuilder: (ctx, i) {
               return GestureDetector(
                 onTap: () {
                   final list = [];
+
                   productProvider.list_of_messages.forEach((e) {
                     if (i == 0 &&
                         (e.status == 'Поступление' ||
@@ -120,10 +121,15 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       list.add(e);
                     } else if (i == 1 && e.status == 'Заказ') {
                       list.add(e);
+                    } else if (i == 4 && e.status == 'Акт сверки') {
+                      list.add(e);
                     }
                   });
-                  print(productProvider.list_of_messages.toList());
-                  print(list);
+
+                  list.sort((a, b) {
+                    return DateTime.parse(b.date)
+                        .compareTo(DateTime.parse(a.date));
+                  });
                   context.router.push(
                       NotificationCategoryDetailRoute(notifications: list));
                 },
@@ -148,7 +154,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                   ? Colors.red
                                   : i == 2
                                       ? Colors.yellowAccent
-                                      : Colors.green,
+                                      : i == 3
+                                          ? Colors.green
+                                          : Colors.red,
                         ),
                       ),
                       SizedBox(
@@ -159,7 +167,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                 ? "Изменение заказов"
                                 : i == 2
                                     ? "Поступление денег"
-                                    : "Прайс листы"),
+                                    : i == 3
+                                        ? "Прайс листы"
+                                        : 'Прочее'),
                       ),
                       Container(
                         alignment: Alignment.centerRight,

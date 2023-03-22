@@ -210,6 +210,8 @@ class _AppDrawerState extends State<AppDrawer> {
                       child: ListTile(
                         onTap: () async {
                           await context.read<AuthProvider>().logout(context);
+                          context.read<CartProvider>().clearAllCart();
+                          context.read<CartProvider>().clearAdditionCart();
                         },
                         title: Text(langs[authProvider.langIndex]['logout']),
                       ),

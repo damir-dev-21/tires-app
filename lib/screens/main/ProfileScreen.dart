@@ -147,24 +147,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(
                       height: 20,
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        context.router.push(const OrdersRoute());
-                      },
-                      child: Text(
-                        langs[authProvider.langIndex]['myOrders'],
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                    ),
-                    const Divider(),
+                    !authProvider.isAuth
+                        ? GestureDetector(
+                            onTap: () async {
+                              await context
+                                  .read<AuthProvider>()
+                                  .logout(context);
+                            },
+                            child: Text(
+                              langs[authProvider.langIndex]["enter"],
+                              style: const TextStyle(fontSize: 18),
+                            ))
+                        : SizedBox(),
                     const SizedBox(
-                      height: 20,
+                      height: 25,
                     ),
                     authProvider.isAuth
                         ? ProfileListItem(
                             authProvider.isAuth,
+                            const OrdersRoute(),
+                            '📕 ' + langs[authProvider.langIndex]['myOrders'],
+                            authProvider.user)
+                        : SizedBox(),
+                    authProvider.isAuth
+                        ? ProfileListItem(
+                            authProvider.isAuth,
                             const CollationActRoute(),
-                            langs[authProvider.langIndex]['akt_sverki'],
+                            '💵 ' + langs[authProvider.langIndex]['akt_sverki'],
                             authProvider.user,
                           )
                         : SizedBox(),
@@ -172,7 +181,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ? ProfileListItem(
                             authProvider.isAuth,
                             const CollationActDetailRoute(),
-                            langs[authProvider.langIndex]['akt_sverki_detail'],
+                            '💵 ' +
+                                langs[authProvider.langIndex]
+                                    ['akt_sverki_detail'],
                             authProvider.user,
                           )
                         : SizedBox(),
@@ -180,7 +191,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ? ProfileListItem(
                             authProvider.isAuth,
                             const AccountBonusRoute(),
-                            langs[authProvider.langIndex]['account_bonus'],
+                            '🤑 ' +
+                                langs[authProvider.langIndex]['account_bonus'],
                             authProvider.user,
                           )
                         : SizedBox(),
@@ -188,7 +200,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ? ProfileListItem(
                             authProvider.isAuth,
                             const DeficitRoute(),
-                            langs[authProvider.langIndex]['deficit_list'],
+                            '😢 ' +
+                                langs[authProvider.langIndex]['deficit_list'],
                             authProvider.user,
                           )
                         : SizedBox(),
@@ -210,8 +223,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             "Доступ запрещен", AlertType.error);
                                   },
                                   child: Text(
-                                    langs[authProvider.langIndex]
-                                        ['subdivision'],
+                                    '🏘️ ' +
+                                        langs[authProvider.langIndex]
+                                            ['subdivision'],
                                     style: const TextStyle(fontSize: 18),
                                   ),
                                 ),
@@ -255,8 +269,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   child: isLoad_exchange
                                       ? CircularProgressIndicator()
                                       : Text(
-                                          langs[authProvider.langIndex]
-                                              ['exchange'],
+                                          '🤑 ' +
+                                              langs[authProvider.langIndex]
+                                                  ['exchange'],
                                           style: const TextStyle(fontSize: 18),
                                         ),
                                 ),
@@ -269,7 +284,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ProfileListItem(
                         isAuth,
                         OpinionRoute(),
-                        langs[authProvider.langIndex]['review'],
+                        '✍🏻 ' + langs[authProvider.langIndex]['review'],
                         authProvider.user),
                     authProvider.isAuth
                         ? Column(
@@ -307,8 +322,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   child: isLoad_balance
                                       ? CircularProgressIndicator()
                                       : Text(
-                                          langs[authProvider.langIndex]
-                                              ['balance'],
+                                          '💰 ' +
+                                              langs[authProvider.langIndex]
+                                                  ['balance'],
                                           style: const TextStyle(fontSize: 18),
                                         ),
                                 ),
@@ -322,25 +338,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ? ProfileListItem(
                             isAuth,
                             const ChangeLanguageRoute(),
-                            langs[authProvider.langIndex]['changeLangText'],
+                            '🔄 ' +
+                                langs[authProvider.langIndex]['changeLangText'],
                             authProvider.user)
                         : SizedBox(),
                     authProvider.isAuth
                         ? ProfileListItem(
                             isAuth,
                             SettingsRoute(),
-                            langs[authProvider.langIndex]['settings'],
+                            '🛠️ ' + langs[authProvider.langIndex]['settings'],
                             authProvider.user)
                         : SizedBox(),
-                    GestureDetector(
-                      onTap: () async {
-                        await context.read<AuthProvider>().logout(context);
-                      },
-                      child: Text(
-                        langs[authProvider.langIndex]["logout"],
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                    ),
+                    authProvider.isAuth
+                        ? GestureDetector(
+                            onTap: () async {
+                              await context
+                                  .read<AuthProvider>()
+                                  .logout(context);
+                              context.read<CartProvider>().clearAllCart();
+                              context.read<CartProvider>().clearAdditionCart();
+                            },
+                            child: Text(
+                              '🏃🏻 ' + langs[authProvider.langIndex]["logout"],
+                              style: const TextStyle(fontSize: 18),
+                            ))
+                        : SizedBox(),
                     const SizedBox(
                       height: 50,
                     )

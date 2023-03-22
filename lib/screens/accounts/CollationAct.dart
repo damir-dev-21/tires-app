@@ -128,7 +128,8 @@ class _CollationActScreenState extends State<CollationActScreen> {
                         // focusNode: _calFocusNode,
                         onTap: () async {
                           FocusScope.of(context).requestFocus(FocusNode());
-                          await cartProvider.showAllClient(context);
+                          await cartProvider.showAllClient(
+                              context, authProvider.user);
                           _selectDateBegin(
                               context, cartProvider.client['uuid_customer']);
                         },
@@ -163,7 +164,8 @@ class _CollationActScreenState extends State<CollationActScreen> {
                         // focusNode: _calFocusNode,
                         onTap: () async {
                           FocusScope.of(context).requestFocus(FocusNode());
-                          await cartProvider.showAllClient(context);
+                          await cartProvider.showAllClient(
+                              context, authProvider.user);
                           _selectDateEnd(
                               context, cartProvider.client['uuid_customer']);
                           print(cartProvider.client);

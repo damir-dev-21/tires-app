@@ -2,7 +2,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:holding_gesture/holding_gesture.dart';
 import 'package:provider/provider.dart';
-import 'package:tires_app/models/Product.dart';
+import 'package:tires_app/models/Product/Product.dart';
+import 'package:tires_app/models/User/User.dart';
 import 'package:tires_app/providers/auth_provider.dart';
 import 'package:tires_app/providers/cart_provider.dart';
 import 'package:tires_app/providers/products_provider.dart';
@@ -15,9 +16,13 @@ class CardItem extends StatefulWidget {
   const CardItem({
     Key? key,
     required this.product,
+    required this.isAuth,
+    required this.user,
   }) : super(key: key);
 
   final Product product;
+  final bool isAuth;
+  final User user;
 
   @override
   State<CardItem> createState() => _CardItemState();
@@ -114,9 +119,13 @@ class _CardItemState extends State<CardItem> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          widget.product.price.toString() +
-                              langs[context.read<AuthProvider>().langIndex]
-                                  ['currency'],
+                          widget.isAuth == false || widget.user.name == 'test'
+                              ? '100' +
+                                  langs[context.read<AuthProvider>().langIndex]
+                                      ['currency']
+                              : widget.product.price.toString() +
+                                  langs[context.read<AuthProvider>().langIndex]
+                                      ['currency'],
                           style: const TextStyle(fontSize: 12),
                         ),
                       ]),
@@ -210,6 +219,7 @@ class _CardItemState extends State<CardItem> {
                                       });
                                     },
                                     child: Container(
+                                        key: const ValueKey('remove'),
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 20, vertical: 10),
                                         decoration: BoxDecoration(
@@ -315,6 +325,7 @@ class _CardItemState extends State<CardItem> {
                                       });
                                     },
                                     child: Container(
+                                        key: const ValueKey('add'),
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 20, vertical: 10),
                                         decoration: BoxDecoration(
